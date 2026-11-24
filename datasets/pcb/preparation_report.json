@@ -1,0 +1,40 @@
+{
+  "source_images_dir": "F:\\PCB_DATASET\\images",
+  "source_annotations_dir": "F:\\PCB_DATASET\\Annotations",
+  "total_usable_images": 693,
+  "split_images": {
+    "val": 180,
+    "test": 120,
+    "train": 393
+  },
+  "board_groups_per_split": {
+    "train": [
+      "05",
+      "06",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12"
+    ],
+    "val": [
+      "01",
+      "07"
+    ],
+    "test": [
+      "04"
+    ]
+  },
+  "class_instance_counts": {
+    "missing_hole": 497,
+    "mouse_bite": 492,
+    "open_circuit": 482,
+    "short": 491,
+    "spur": 488,
+    "spurious_copper": 503
+  },
+  "skipped_without_xml": [],
+  "skipped_invalid_or_empty_annotations": [],
+  "split_strategy": "grouped by leading numeric filename prefix",
+  "seed": 42
+}
