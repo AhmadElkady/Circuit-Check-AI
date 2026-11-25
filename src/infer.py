@@ -41,3 +41,28 @@ def run_inference(
         image_shape=shape,
         weights_path=resolved_weights,
     )
+
+
+@dataclass
+class RawDetection:
+    class_name: str
+    confidence: float
+    xyxy: tuple[float, float, float, float]
+
+
+def convert_yolo_results(results):
+    raw_detections = []
+
+    for result in results:
+        for box in result.boxes:
+            class_id = int(box.cls[0].item())
+
+            raw_detections.append(
+                RawDetection(
+                    class_name=result.names[class_id],
+                    confidence=float(box.conf[0].item()),
+                    xyxy=tuple(box.xyxy[0].tolist())
+                )
+            )
+
+    return raw_detections
