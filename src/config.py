@@ -40,11 +40,12 @@ CLASSES = [
 
 # severity per class: "critical" | "major" | "minor"
 SEVERITY = {
-    "missing_component": "critical",
-    "misplaced_shifted": "critical",
-    "wrong_orientation": "critical",
-    "solder_bridge": "critical",
-    "insufficient_solder": "major",
+    "missing_hole": "major",
+    "mouse_bite": "minor",
+    "open_circuit": "critical",
+    "short": "critical",
+    "spur": "minor",
+    "spurious_copper": "major",
 }
 CRITICAL = {c for c, s in SEVERITY.items() if s == "critical"}
 
