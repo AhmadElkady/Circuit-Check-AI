@@ -1,63 +1,72 @@
 
 from pathlib import Path
+import shutil
+
 from ultralytics import YOLO
 
-# Project paths
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-DATASET_CONFIG = PROJECT_ROOT / "datasets" / "pcb" / "data.yaml"
-
-OUTPUT_DIR = PROJECT_ROOT / "models" / "yolo" / "weights"
-
-TRAINING_RESULTS = PROJECT_ROOT / "outputs" / "training_results"
+from config import (
+    DATA_YAML,
+    BASE_MODEL,
+    EPOCHS,
+    IMGSZ,
+    BATCH,
+    DEVICE,
+    SEED,
+    AUGMENT,
+    TRAINING_DIR,
+    WEIGHTS,
+    ensure_dirs,
+    validate,
+    validate_against_data_yaml,
+)
 
 
 def train_model():
 
-    # 1. Check dataset configuration
-    if not DATASET_CONFIG.exists():
+    # 1. Validate configuration
+    validate()
+    validate_against_data_yaml()
+
+    if not DATA_YAML.exists():
         raise FileNotFoundError(
-            f"Dataset configuration not found: {DATASET_CONFIG}"
+            f"Dataset configuration not found: {DATA_YAML}"
         )
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    TRAINING_RESULTS.mkdir(parents=True, exist_ok=True)
+    ensure_dirs()
 
-    # 2. Load pretrained YOLO model
-    model = YOLO("yolo11n.pt")
+    # 2. Load pretrained model
+    model = YOLO(BASE_MODEL)
 
-    # 3. Train model
+    # 3. Train
     results = model.train(
-        data=str(DATASET_CONFIG),
-        epochs=100,
-        imgsz=640,
-        batch=16,
-        patience=20,
-        optimizer="auto",
-        device="0",  # NVIDIA GPU; change to "cpu" if unavailable
-        project=str(TRAINING_RESULTS),
+        data=str(DATA_YAML),
+        epochs=EPOCHS,
+        imgsz=IMGSZ,
+        batch=BATCH,
+        device=DEVICE,
+        seed=SEED,
+        fliplr=AUGMENT["fliplr"],
+        flipud=AUGMENT["flipud"],
+        mosaic=AUGMENT["mosaic"],
+        project=str(TRAINING_DIR),
         name="pcb_defect_detection",
         exist_ok=True,
+        patience=20,
         plots=True,
         save=True,
-        workers=4
     )
 
-    # 4. Save best model
-    best_weights = (
-        Path(results.save_dir) / "weights" / "best.pt"
-    )
+    # 4. Retrieve best weights
+    best_weights = Path(results.save_dir) / "weights" / "best.pt"
 
     if not best_weights.exists():
-        raise FileNotFoundError("Training completed but best.pt was not found.")
+        raise FileNotFoundError("Best model weights were not generated.")
 
-    import shutil
+    # 5. Copy trained weights to deployment location
+    shutil.copy2(best_weights, WEIGHTS)
 
-    destination = OUTPUT_DIR / "best.pt"
-    shutil.copy2(best_weights, destination)
-
-    print("\nTraining completed successfully!")
-    print(f"Best model saved at: {destination}")
+    print("\nTraining completed!")
+    print(f"Best model: {WEIGHTS}")
 
 
 if __name__ == "__main__":

@@ -30,12 +30,12 @@ TRAINING_DIR = OUTPUT_DIR / "training_results"
 # ORDER MATTERS: index i here must be class id i in datasets/pcb/data.yaml.
 # Only list defects you actually have labeled examples of.
 CLASSES = [
-    "missing_component",
-    "misplaced_shifted",
-    "wrong_orientation",
-    "solder_bridge",
-    "insufficient_solder",
-    # "scratch", "crack", "unusual_pattern",   # add only once you have labels
+    "missing_hole",
+    "mouse_bite",
+    "open_circuit",
+    "short",
+    "spur",
+    "spurious_copper",
 ]
 
 # severity per class: "critical" | "major" | "minor"
