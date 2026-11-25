@@ -1,0 +1,23 @@
+{
+    "board_id": "board_A",
+    "timestamp": "2026-11-25T20:26:06",
+    "source_image": "D:\\circuitcheck\\datasets\\pcb\\images\\test\\example.jpg",
+    "inspection": {
+        "status": "PASS",
+        "inspection_complete": true,
+        "total_defects": 0,
+        "total_review_candidates": 0
+    },
+    "summary": {
+        "confirmed_defects": {},
+        "review_candidates": {}
+    },
+    "defects": [],
+    "review_candidates": [],
+    "reasons": [
+        "No PCB defects detected."
+    ],
+    "artifacts": {
+        "annotated_image": "D:\\circuitcheck\\outputs\\annotated\\board_A_20261125_202605_644903.png"
+    }
+}

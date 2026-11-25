@@ -1,0 +1,66 @@
+{
+    "board_id": "board_A",
+    "timestamp": "2026-11-25T22:02:15",
+    "source_image": "D:\\circuitcheck\\datasets\\pcb\\images\\test\\example.jpg",
+    "inspection": {
+        "status": "FAIL",
+        "inspection_complete": true,
+        "total_defects": 2,
+        "total_review_candidates": 1
+    },
+    "summary": {
+        "confirmed_defects": {
+            "spurious_copper": 2
+        },
+        "review_candidates": {
+            "spur": 1
+        }
+    },
+    "defects": [
+        {
+            "class_name": "spurious_copper",
+            "confidence": 0.6003,
+            "severity": "major",
+            "bounding_box": {
+                "x1": 555.54,
+                "y1": 492.08,
+                "x2": 594.24,
+                "y2": 509.84
+            },
+            "area": 687.3
+        },
+        {
+            "class_name": "spurious_copper",
+            "confidence": 0.5856,
+            "severity": "major",
+            "bounding_box": {
+                "x1": 694.27,
+                "y1": 389.94,
+                "x2": 718.76,
+                "y2": 450.85
+            },
+            "area": 1492.3
+        }
+    ],
+    "review_candidates": [
+        {
+            "class_name": "spur",
+            "confidence": 0.3697,
+            "severity": "minor",
+            "bounding_box": {
+                "x1": 306.0,
+                "y1": 344.87,
+                "x2": 337.51,
+                "y2": 362.77
+            },
+            "area": 564.13
+        }
+    ],
+    "reasons": [
+        "spurious_copper detected (severity: major, confidence: 0.60)",
+        "spurious_copper detected (severity: major, confidence: 0.59)"
+    ],
+    "artifacts": {
+        "annotated_image": "D:\\circuitcheck\\outputs\\annotated\\board_A_20261125_220215_796447.png"
+    }
+}

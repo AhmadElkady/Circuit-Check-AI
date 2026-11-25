@@ -1,8 +1,7 @@
-path: F:/study sem5/Ai/Circuit-Check-AI/datasets/pcb
+path: D:/circuitcheck/datasets/pcb
 train: images/train
 val: images/val
 test: images/test
-
 nc: 6
 names:
   0: missing_hole

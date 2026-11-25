@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: yolov8n.pt
-data: F:\study sem5\Ai\Circuit-Check-AI\datasets\pcb\data.yaml
+data: D:\circuitcheck\datasets\pcb\data.yaml
 epochs: 50
 time: null
 patience: 20
@@ -12,7 +12,7 @@ save_period: -1
 cache: false
 device: cpu
 workers: 8
-project: F:\study sem5\Ai\Circuit-Check-AI\outputs\training_results
+project: D:\circuitcheck\outputs\training_results
 name: pcb_defect_detection
 exist_ok: true
 pretrained: true
@@ -113,4 +113,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: tracktrack.yaml
-save_dir: F:\study sem5\Ai\Circuit-Check-AI\outputs\training_results\pcb_defect_detection
+save_dir: D:\circuitcheck\outputs\training_results\pcb_defect_detection

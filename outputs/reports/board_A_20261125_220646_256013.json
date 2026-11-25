@@ -1,0 +1,90 @@
+{
+    "board_id": "board_A",
+    "timestamp": "2026-11-25T22:06:47",
+    "source_image": "D:\\circuitcheck\\datasets\\pcb\\images\\test\\example.jpg",
+    "inspection": {
+        "status": "FAIL",
+        "inspection_complete": true,
+        "total_defects": 5,
+        "total_review_candidates": 0
+    },
+    "summary": {
+        "confirmed_defects": {
+            "open_circuit": 5
+        },
+        "review_candidates": {}
+    },
+    "defects": [
+        {
+            "class_name": "open_circuit",
+            "confidence": 0.8603,
+            "severity": "critical",
+            "bounding_box": {
+                "x1": 2210.1,
+                "y1": 1050.57,
+                "x2": 2252.2,
+                "y2": 1090.09
+            },
+            "area": 1663.86
+        },
+        {
+            "class_name": "open_circuit",
+            "confidence": 0.8086,
+            "severity": "critical",
+            "bounding_box": {
+                "x1": 1830.14,
+                "y1": 1439.07,
+                "x2": 1870.51,
+                "y2": 1484.61
+            },
+            "area": 1838.61
+        },
+        {
+            "class_name": "open_circuit",
+            "confidence": 0.6936,
+            "severity": "critical",
+            "bounding_box": {
+                "x1": 1267.77,
+                "y1": 1632.04,
+                "x2": 1316.05,
+                "y2": 1677.25
+            },
+            "area": 2182.46
+        },
+        {
+            "class_name": "open_circuit",
+            "confidence": 0.6814,
+            "severity": "critical",
+            "bounding_box": {
+                "x1": 1202.57,
+                "y1": 456.01,
+                "x2": 1250.36,
+                "y2": 499.58
+            },
+            "area": 2082.26
+        },
+        {
+            "class_name": "open_circuit",
+            "confidence": 0.6768,
+            "severity": "critical",
+            "bounding_box": {
+                "x1": 821.48,
+                "y1": 951.78,
+                "x2": 872.09,
+                "y2": 996.77
+            },
+            "area": 2276.87
+        }
+    ],
+    "review_candidates": [],
+    "reasons": [
+        "open_circuit detected (severity: critical, confidence: 0.86)",
+        "open_circuit detected (severity: critical, confidence: 0.81)",
+        "open_circuit detected (severity: critical, confidence: 0.69)",
+        "open_circuit detected (severity: critical, confidence: 0.68)",
+        "open_circuit detected (severity: critical, confidence: 0.68)"
+    ],
+    "artifacts": {
+        "annotated_image": "D:\\circuitcheck\\outputs\\annotated\\board_A_20261125_220646_256013.png"
+    }
+}
