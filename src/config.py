@@ -62,9 +62,13 @@ AUGMENT = {"fliplr": 0.0, "flipud": 0.0, "mosaic": 0.5}
 
 # ---------------------------------------------------------------- detection
 CONF_DEFAULT = 0.40
-CONF_THRESHOLDS = {            # per-class overrides of CONF_DEFAULT
-    "missing_component": 0.35,
-    "solder_bridge": 0.30,
+CONF_THRESHOLDS = {
+    "missing_hole": 0.35,
+    "mouse_bite": 0.40,
+    "open_circuit": 0.30,
+    "short": 0.30,
+    "spur": 0.40,
+    "spurious_copper": 0.35,
 }
 USE_TILING = False             # True for tiny defects on large images
 TILE_SIZE = 640
