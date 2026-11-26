@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081525">
+  <title>About | Circuit-Check-AI</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./about.js"></script>
+</head>
+<body class="page-about">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="site-bar shell">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true"></span>Circuit-Check-AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="./index.html">Inspect</a>
+        <a href="./about.html" aria-current="page">About</a>
+        <a href="./history.html">History</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="shell about-main">
+    <header class="page-intro about-intro">
+      <h1>About Circuit-Check-AI</h1>
+      <p>Find visible defects in printed circuit boards.</p>
+    </header>
+
+    <div class="about-grid">
+      <section class="panel workflow-panel" aria-labelledby="workflow-heading">
+        <h2 id="workflow-heading">How inspection works</h2>
+        <ol class="workflow-steps">
+          <li>
+            <span class="icon icon-upload" aria-hidden="true"></span>
+            <span>Upload a PCB photo</span>
+            <span class="step-arrow icon icon-right" aria-hidden="true"></span>
+          </li>
+          <li>
+            <span class="icon icon-chip" aria-hidden="true"></span>
+            <span>Detect defects with YOLO</span>
+            <span class="step-arrow icon icon-right" aria-hidden="true"></span>
+          </li>
+          <li>
+            <span class="icon icon-frame" aria-hidden="true"></span>
+            <span>Review marked locations</span>
+            <span class="step-arrow icon icon-right" aria-hidden="true"></span>
+          </li>
+          <li>
+            <span class="icon icon-download" aria-hidden="true"></span>
+            <span>Download the report</span>
+          </li>
+        </ol>
+      </section>
+
+      <figure class="panel about-sample">
+        <div class="about-sample-media">
+          <img id="about-image" alt="Sample PCB with two confirmed defects and one review candidate marked" hidden>
+          <p id="about-image-status" role="status">Loading sample image…</p>
+        </div>
+        <figcaption>Sample inspection</figcaption>
+      </figure>
+    </div>
+
+    <section class="panel defect-types" aria-labelledby="defect-types-heading">
+      <h2 id="defect-types-heading">Defects the model looks for</h2>
+      <ul class="defect-type-list">
+        <li>Missing hole</li>
+        <li>Mouse bite</li>
+        <li>Open circuit</li>
+        <li>Short</li>
+        <li>Spur</li>
+        <li>Spurious copper</li>
+      </ul>
+    </section>
+
+    <footer class="about-footer">
+      <p>Results depend on image quality. Review flagged areas before deciding.</p>
+      <a class="button button-primary" href="./index.html"><span class="icon icon-play" aria-hidden="true"></span>Go to inspection</a>
+    </footer>
+  </main>
+</body>
+</html>

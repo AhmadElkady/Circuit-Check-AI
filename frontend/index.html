@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081525">
+  <title>Inspect | Circuit-Check-AI</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./inspect.js"></script>
+</head>
+<body class="page-inspect">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="site-bar shell">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true"></span>Circuit-Check-AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="./index.html" aria-current="page">Inspect</a>
+        <a href="./about.html">About</a>
+        <a href="./history.html">History</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="shell inspect-main">
+    <h1 class="visually-hidden">Inspect a PCB</h1>
+    <section class="inspection-actions" aria-label="Inspection controls">
+      <div class="file-control" id="file-control">
+        <span class="icon icon-upload" aria-hidden="true"></span>
+        <span class="file-name" id="file-name">No image selected</span>
+        <button class="text-button file-picker" id="choose-image" type="button">Choose image</button>
+        <input id="pcb-file" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden>
+      </div>
+      <button class="button button-primary" id="open-sample" type="button"><span class="icon icon-play" aria-hidden="true"></span>Open sample inspection</button>
+      <button class="button button-primary" id="run-inspection" type="button" disabled aria-describedby="live-explanation">Run inspection</button>
+      <a class="button download-action" id="download-report" hidden download><span class="icon icon-download" aria-hidden="true"></span>Download report</a>
+    </section>
+    <div class="inspection-notice">
+      <p id="live-explanation" role="status">Upload a PCB photo to run an inspection.</p>
+      <p class="notice-error" id="inspection-error" role="alert" hidden></p>
+    </div>
+
+    <div class="inspect-workspace">
+      <div class="boards">
+        <div class="zoom-controls panel" role="group" aria-label="Image zoom controls">
+          <span class="icon icon-search" aria-hidden="true"></span>
+          <label class="sync-control" for="sync-zoom">Synced zoom <input id="sync-zoom" type="checkbox" role="switch" disabled><span class="switch-ui" aria-hidden="true"></span></label>
+          <div class="select-wrap">
+            <label class="visually-hidden" for="zoom-level">Zoom level</label>
+            <select id="zoom-level" disabled>
+              <option value="1">Fit</option>
+              <option value="2">2×</option>
+              <option value="4">4×</option>
+              <option value="8">8×</option>
+              <option id="finding-zoom" value="detail" hidden>Finding</option>
+            </select>
+          </div>
+          <button class="button button-small" id="fit-board" type="button" disabled><span class="icon icon-frame" aria-hidden="true"></span>Fit board</button>
+        </div>
+        <div class="board-grid">
+          <section class="panel board-panel" id="original-panel" aria-labelledby="original-heading">
+            <h2 id="original-heading">Original PCB</h2>
+            <div class="image-stage" id="original-stage">
+              <div class="board-layer" id="original-layer" hidden><img id="original-image" alt="Original PCB"></div>
+              <div class="board-empty" id="original-empty">
+                <div class="empty-symbol" id="original-placeholder-icon"><span class="icon icon-upload" aria-hidden="true"></span></div>
+                <strong id="original-message">Drop a PCB image here</strong>
+                <span id="original-hint">Choose a JPG or PNG to preview it.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel board-panel" aria-labelledby="analysis-heading">
+            <h2 id="analysis-heading">AI Inspection</h2>
+            <div class="image-stage" id="analysis-stage">
+              <div class="board-layer" id="analysis-layer" hidden><img id="annotated-image" alt="Annotated PCB from the saved inspection"></div>
+              <div class="detection-box" id="active-box" aria-hidden="true" hidden><span id="active-box-label"></span></div>
+              <div class="board-map" id="board-map" aria-hidden="true" hidden>
+                <img id="map-image" alt="">
+                <div id="map-markers"></div>
+                <div class="map-view" id="map-view"></div>
+              </div>
+              <div class="board-empty" id="analysis-empty">
+                <div class="empty-symbol"><span class="icon icon-frame" aria-hidden="true"></span></div>
+                <strong>No inspection open</strong>
+                <span>Open a sample to review marked defects.</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="panel verdict-panel" aria-labelledby="verdict-heading">
+        <header class="verdict-heading">
+          <h2 id="verdict-heading">Inspection &amp; Verdict</h2>
+          <span class="sample-tag" id="sample-tag" hidden>Sample inspection</span>
+        </header>
+        <div class="verdict-empty" id="verdict-empty">No verdict yet.</div>
+        <div id="verdict-results" hidden>
+          <div class="verdict-summary">
+            <strong class="verdict verdict-large" id="verdict"></strong>
+            <p class="confirmed-total" id="confirmed-total"></p>
+            <p class="review-total" id="review-total"></p>
+          </div>
+          <section class="findings-section" aria-labelledby="findings-heading">
+            <h3 id="findings-heading">Findings</h3>
+            <ol class="findings-list" id="findings"></ol>
+            <p class="no-findings" id="no-findings" hidden>No findings in this inspection.</p>
+          </section>
+          <div class="finding-nav" id="finding-nav">
+            <button class="button button-small" id="previous-finding" type="button"><span class="icon icon-left" aria-hidden="true"></span>Previous</button>
+            <span id="finding-position" aria-live="polite"></span>
+            <button class="button button-small" id="next-finding" type="button">Next<span class="icon icon-right" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

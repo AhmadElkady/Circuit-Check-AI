@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081525">
+  <title>History | Circuit-Check-AI</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./history.js"></script>
+</head>
+<body class="page-history">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="site-bar shell">
+      <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true"></span>Circuit-Check-AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="./index.html">Inspect</a>
+        <a href="./about.html">About</a>
+        <a href="./history.html" aria-current="page">History</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="shell history-main">
+    <header class="page-intro history-intro">
+      <h1>Inspection history</h1>
+      <a class="button button-primary" href="./index.html?new=1"><span class="icon icon-plus" aria-hidden="true"></span>New inspection</a>
+    </header>
+
+    <div class="history-filters" role="search" aria-label="Filter sample history">
+      <div class="history-filter search-field">
+        <span class="icon icon-search" aria-hidden="true"></span>
+        <label class="visually-hidden" for="filename-search">Search by filename</label>
+        <input type="search" id="filename-search" placeholder="Search by filename" autocomplete="off" aria-controls="history-table">
+      </div>
+      <div class="history-filter select-wrap">
+        <span class="icon icon-filter" aria-hidden="true"></span>
+        <label class="visually-hidden" for="verdict-filter">Filter by verdict</label>
+        <select id="verdict-filter" aria-controls="history-table">
+          <option value="">All verdicts</option>
+          <option value="PASS">PASS</option>
+          <option value="FAIL">FAIL</option>
+          <option value="REVIEW">REVIEW</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="history-grid">
+      <section class="panel history-list" aria-labelledby="history-heading">
+        <h2 id="history-heading">Sample history</h2>
+        <table id="history-table" class="history-table" aria-labelledby="history-heading" hidden>
+          <thead>
+            <tr>
+              <th scope="col">File</th>
+              <th scope="col">Inspected</th>
+              <th scope="col">Verdict</th>
+              <th scope="col">Defects</th>
+            </tr>
+          </thead>
+          <tbody id="history-rows"></tbody>
+        </table>
+        <div class="history-empty" id="history-empty">
+          <p role="status" id="history-status">Loading sample history…</p>
+          <button class="button button-small" id="reset-filters" type="button" hidden>Clear filters</button>
+        </div>
+      </section>
+
+      <section class="panel history-preview" aria-labelledby="preview-heading">
+        <header class="preview-heading">
+          <span class="icon icon-image" aria-hidden="true"></span>
+          <h2 id="preview-heading">Inspection preview</h2>
+        </header>
+        <div class="history-image-frame">
+          <img id="history-image" alt="Annotated PCB from the selected sample" hidden>
+          <p id="preview-status" role="status">Select a sample to preview its board.</p>
+        </div>
+        <div class="preview-actions" id="preview-actions" hidden>
+          <a class="button button-primary" id="open-inspection"><span class="icon icon-play" aria-hidden="true"></span>Open inspection</a>
+          <a class="button" id="history-download" download><span class="icon icon-download" aria-hidden="true"></span>Download report</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
