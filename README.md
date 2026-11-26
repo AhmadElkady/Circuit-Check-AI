@@ -1,22 +1,39 @@
 # Circuit-Check-AI
 
+![Circuit-Check-AI computer vision project banner with a circuit chip](docs/media/banner.png)
+
+**Python** · **YOLOv8** · **OpenCV** · **Streamlit**
+
 **Upload a PCB photo. See where the model found a defect. Export the inspection report.**
 
 Circuit-Check-AI is a university Artificial Intelligence project that uses YOLO to locate visible defects in photos of bare printed circuit boards (PCBs). Each completed inspection produces a board verdict, a PNG with marked defect locations, and a JSON report with the findings.
 
-[Quick start](#quick-start) · [Sample results](outputs/reports/) · [Frontend roadmap](#frontend-roadmap)
+[Interface gallery](#interface-gallery) · [Sample results](#see-a-sample-result) · [Quick start](#quick-start) · [Frontend roadmap](#frontend-roadmap)
+
+## Interface gallery
+
+> These design mockups preview the planned HTML, CSS, and JavaScript frontend. The runnable interface in the reviewed repository is the Streamlit demo.
+
+### Inspect
+
+[![Inspect mockup showing synced PCB zoom and a selected defect](docs/media/inspect.png)](docs/media/inspect.png)
+
+Compare the original and marked board at the same zoom level. Each finding gets its own marker, so multiple missing holes can be reviewed one at a time.
+
+### About and History
+
+| About | History |
+| :--- | :--- |
+| [![About mockup showing inspection steps and defect types](docs/media/about.png)](docs/media/about.png) | [![History mockup showing verdict filters and a selected result](docs/media/history.png)](docs/media/history.png) |
+| Walk through the inspection process and see the six supported defect classes. | Search sample inspections, filter by verdict, and preview a selected report. |
 
 ## How an inspection works
 
-```mermaid
-flowchart LR
-    A[PCB photo] --> B[YOLO detection]
-    B --> C[Filter and score detections]
-    C --> D[Assign verdict]
-    D --> E[Annotated PNG and JSON report]
-```
+![Four-step inspection pipeline from image decoding through YOLO and detection filtering to report export](docs/media/pipeline.png)
 
 The model looks for **missing holes, mouse bites, open circuits, shorts, spurs, and spurious copper**. Its training scope is bare-board defects. Inspection of missing or misplaced components on assembled boards is outside that scope.
+
+![PASS for no flagged findings after a complete inspection, REVIEW for borderline or incomplete, FAIL for a confirmed defect](docs/media/verdicts.png)
 
 | Verdict | Meaning |
 | --- | --- |
