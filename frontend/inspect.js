@@ -1,9 +1,10 @@
-import { featuredId, inspectionData } from "./data.js";
+import { inspectionData } from "./data.js";
 
 const byId = (id) => document.getElementById(id);
 const fileInput = byId("pcb-file");
 const chooseImage = byId("choose-image");
 const openSample = byId("open-sample");
+const historyLink = byId("history-link");
 const download = byId("download-report");
 const error = byId("inspection-error");
 const syncZoom = byId("sync-zoom");
@@ -86,14 +87,17 @@ function clearObjectUrl() {
 
 function recordInUrl(id) {
   const url = new URL(location.href);
+  const historyUrl = new URL("./history.html", url);
   url.searchParams.delete("new");
   if (id) {
     url.searchParams.set("inspection", id);
+    historyUrl.searchParams.set("inspection", id);
   } else {
     url.searchParams.delete("inspection");
     url.searchParams.set("new", "1");
   }
   history.replaceState(null, "", url);
+  historyLink.href = historyUrl.href;
 }
 
 function prepareControls() {
@@ -231,7 +235,7 @@ function renderVerdictBadge(badge, status, feedback = false) {
   badge.classList.add("is-feedback");
 }
 
-function renderVerdict(record, { feedback = false, sample = true } = {}) {
+function renderVerdict(record, feedback) {
   const verdict = byId("verdict");
   const confirmed = byId("confirmed-total");
   const { status, total_defects, total_review_candidates } = record.report.inspection;
@@ -242,12 +246,32 @@ function renderVerdict(record, { feedback = false, sample = true } = {}) {
 
   byId("verdict-empty").hidden = true;
   byId("verdict-results").hidden = false;
-  byId("sample-tag").hidden = !sample;
-  download.href = record.reportUrl;
-  download.download = record.id + ".json";
-  download.hidden = false;
+  byId("sample-tag").hidden = !record.sample;
+  if (record.pdfUrl) download.href = record.pdfUrl;
+  else download.removeAttribute("href");
+  download.download = record.id + ".pdf";
+  download.hidden = !record.pdfUrl;
   renderFindings(record.report);
   renderVerdictBadge(verdict, status, feedback);
+}
+
+function readBoards(record) {
+  return Promise.all([
+    record.originalUrl ? readImage(record.originalUrl) : null,
+    readImage(record.annotatedUrl),
+  ]);
+}
+
+function showRecord(record, [originalBoard, annotatedBoard], feedback = false) {
+  clearObjectUrl();
+  setFileLabel(record.filename, true);
+  setBoard(original, originalBoard);
+  setBoard(analysis, annotatedBoard);
+  byId("map-image").src = annotatedBoard.url;
+  prepareControls();
+  renderVerdict(record, feedback);
+  recordInUrl(record.id);
+  draw();
 }
 
 async function showInspection(id) {
@@ -260,22 +284,13 @@ async function showInspection(id) {
   updateRunButton();
   try {
     const record = await inspectionData.get(id);
-    const annotatedBoard = await readImage(record.annotatedUrl);
-    const originalBoard = record.originalUrl ? await readImage(record.originalUrl).catch(() => null) : null;
+    const boards = await readBoards(record);
     if (request !== revision) return;
 
-    clearObjectUrl();
     uploadedFile = null;
-    setFileLabel(record.filename, true);
-    setBoard(original, originalBoard);
-    setBoard(analysis, annotatedBoard);
-    byId("map-image").src = annotatedBoard.url;
-    prepareControls();
-    renderVerdict(record);
-    recordInUrl(record.id);
-    draw();
+    showRecord(record, boards);
   } catch (problem) {
-    if (request === revision) notify(problem.message || "Could not open the sample inspection.");
+    if (request === revision) notify(problem.message || "Could not open the inspection.");
   } finally {
     if (request === revision) {
       openSample.removeAttribute("aria-busy");
@@ -351,7 +366,6 @@ async function runInspection() {
   const audioReady = unlockAudio();
   silenceVerdictCue();
   const request = ++revision;
-  const source = original.board;
   running = true;
   notify();
   clearInspection();
@@ -359,17 +373,12 @@ async function runInspection() {
   draw();
   try {
     const record = await inspectionData.inspect(uploadedFile);
-    const annotatedBoard = await readImage(record.annotatedUrl);
+    const boards = await readBoards(record);
     if (request !== revision) return;
-    setBoard(original, source);
-    setBoard(analysis, annotatedBoard);
-    byId("map-image").src = annotatedBoard.url;
-    prepareControls();
-    renderVerdict(record, { feedback: true, sample: false });
+    showRecord(record, boards, true);
     void audioReady?.then(() => {
       if (request === revision) playVerdictCue(record.report.inspection.status);
     });
-    draw();
   } catch (problem) {
     if (request === revision) notify(problem.message || "Could not run inspection.");
   } finally {
@@ -496,7 +505,7 @@ for (const target of [original.stage, byId("file-control")]) {
     }
   });
 }
-openSample.addEventListener("click", () => showInspection(featuredId));
+openSample.addEventListener("click", () => showInspection());
 previous.addEventListener("click", () => chooseFinding(active - 1));
 next.addEventListener("click", () => chooseFinding(active + 1));
 fitBoard.addEventListener("click", resetZoom);
@@ -525,5 +534,5 @@ runButton.addEventListener("click", runInspection);
 
 const params = new URLSearchParams(location.search);
 if (params.has("inspection") || !params.has("new")) {
-  showInspection(params.get("inspection") || featuredId);
+  showInspection(params.get("inspection"));
 }

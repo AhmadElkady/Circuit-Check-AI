@@ -49,12 +49,14 @@ function showSelected(record) {
     const url = new URL("./index.html", location.href);
     url.searchParams.set("inspection", record.id);
     openInspection.href = url.href;
-    download.href = record.reportUrl;
-    download.download = record.id + ".json";
+    if (record.pdfUrl) download.href = record.pdfUrl;
+    else download.removeAttribute("href");
+    download.download = record.id + ".pdf";
+    download.hidden = !record.pdfUrl;
   } else {
     preview.removeAttribute("src");
     preview.hidden = true;
-    previewStatus.textContent = "Select a sample to preview its board.";
+    previewStatus.textContent = "Select an inspection to preview its board.";
     previewStatus.hidden = false;
     openInspection.removeAttribute("href");
     download.removeAttribute("href");
@@ -103,7 +105,7 @@ function makeRow(record) {
 function renderHistory() {
   const query = search.value.toLowerCase().trim();
   visibleRecords = records.filter((record) => {
-    const searchable = [record.filename, record.id + ".json", record.id + ".png"].join(" ").toLowerCase();
+    const searchable = [record.filename, record.id + ".json", record.id + ".png", record.id + ".pdf"].join(" ").toLowerCase();
     return searchable.includes(query) && (!filter.value || record.report.inspection.status === filter.value);
   });
   rows.replaceChildren(...visibleRecords.map(makeRow));
@@ -111,7 +113,7 @@ function renderHistory() {
   table.hidden = noResults;
   byId("history-empty").hidden = !noResults;
   byId("history-status").textContent = records.length
-    ? "No sample inspections match your filters."
+    ? "No inspections match your filters."
     : "No saved report and annotated image pairs are available.";
   reset.hidden = !(records.length && (query || filter.value));
   showSelected(visibleRecords.find((record) => record.id === selectedId) ?? visibleRecords[0]);

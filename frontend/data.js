@@ -11,7 +11,8 @@ const samples = new Map([
 ]);
 
 const outputs = new URL("../outputs/", import.meta.url);
-const records = new Map();
+const api = new URL("../api/", import.meta.url);
+const sampleRecords = new Map();
 const verdicts = new Set(["PASS", "FAIL", "REVIEW"]);
 
 function validFinding(finding) {
@@ -45,7 +46,41 @@ function validReport(report) {
   );
 }
 
-async function loadRecord(id, sample) {
+function readRecord(record) {
+  if (!validReport(record?.report) || typeof record.id !== "string" || !record.id ||
+      ![record.annotatedUrl, record.reportUrl, record.pdfUrl].every((url) => typeof url === "string" && url) ||
+      (record.originalUrl !== null && (typeof record.originalUrl !== "string" || !record.originalUrl))) {
+    return null;
+  }
+  return {
+    ...record,
+    filename: record.report.source_image.trim().split(/[\\/]/).pop(),
+    timestamp: record.report.timestamp,
+    sample: samples.has(record.id),
+  };
+}
+
+async function loadCatalog() {
+  const records = new Map();
+  try {
+    const response = await fetch(new URL("inspections", api), { cache: "no-store" });
+    const catalog = response.ok ? await response.json() : null;
+    if (Array.isArray(catalog?.records)) {
+      for (const item of catalog.records) {
+        const record = readRecord(item);
+        if (record) records.set(record.id, record);
+      }
+      const featured = records.get(catalog.featuredId);
+      if (featured) featured.sample = true;
+      return { records, featured, available: true };
+    }
+  } catch {
+    // Samples can also be served by a static HTTP server.
+  }
+  return { records, featured: null, available: false };
+}
+
+async function loadSample(id, sample) {
   const reportUrl = new URL(`reports/${id}.json`, outputs).href;
   const annotatedUrl = new URL(`annotated/${id}.png`, outputs).href;
   const [reportResponse, imageResponse] = await Promise.all([
@@ -78,34 +113,46 @@ async function loadRecord(id, sample) {
     reportUrl,
     annotatedUrl,
     originalUrl: sample.original ? new URL(sample.original, outputs).href : null,
+    sample: true,
   };
 }
 
-async function get(id) {
+async function getSample(id, catalogAvailable) {
   if (!samples.has(id)) {
-    throw new Error("This sample inspection could not be found.");
+    throw new Error("This inspection could not be found.");
   }
 
-  if (!records.has(id)) {
-    const record = loadRecord(id, samples.get(id)).catch((error) => {
-      records.delete(id);
+  if (!sampleRecords.has(id)) {
+    const record = loadSample(id, samples.get(id)).catch((error) => {
+      sampleRecords.delete(id);
       throw error;
     });
-    records.set(id, record);
+    sampleRecords.set(id, record);
   }
+  const record = await sampleRecords.get(id);
+  const pdfUrl = catalogAvailable ? new URL(`reports/${id}.pdf`, api).href : null;
+  return { ...record, pdfUrl };
+}
 
-  return records.get(id);
+async function get(id) {
+  const catalog = await loadCatalog();
+  const targetId = id || catalog.featured?.id || featuredId;
+  return catalog.records.get(targetId) ?? getSample(targetId, catalog.available);
 }
 
 async function list() {
-  const results = await Promise.allSettled([...samples.keys()].map(get));
-  return results.flatMap((result) => (result.status === "fulfilled" ? [result.value] : []));
+  const catalog = await loadCatalog();
+  const archivedIds = [...samples.keys()].filter((id) => !catalog.records.has(id));
+  const archived = await Promise.allSettled(archivedIds.map((id) => getSample(id, catalog.available)));
+  const records = [...catalog.records.values(), ...archived.flatMap((result) =>
+    result.status === "fulfilled" ? [result.value] : [])];
+  return records.sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
 }
 
 async function inspect(file) {
   const upload = new FormData();
   upload.append("image", file);
-  const response = await fetch(new URL("../api/inspect", import.meta.url), {
+  const response = await fetch(new URL("inspect", api), {
     method: "POST",
     body: upload,
   });
@@ -115,16 +162,11 @@ async function inspect(file) {
       ? data.detail
       : "Inspection failed. Make sure the Python preview server is running.");
   }
-  if (!validReport(data?.report) || !data.annotatedImage?.startsWith("data:image/png;base64,")) {
+  const record = readRecord(data);
+  if (!record?.originalUrl) {
     throw new Error("The server returned an incomplete inspection.");
   }
-  return {
-    id: file.name.replace(/\.[^.]+$/, "") + "-inspection",
-    filename: file.name,
-    report: data.report,
-    annotatedUrl: data.annotatedImage,
-    reportUrl: "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data.report, null, 2)),
-  };
+  return record;
 }
 
 export const inspectionData = { get, list, inspect };
