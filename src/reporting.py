@@ -122,6 +122,8 @@ def generate_report(
     image_path: str | Path,
     result: DecisionResult,
     board_id: str = "unknown",
+    *,
+    output_dir: Path | None = None,
 ) -> ReportPaths:
     """
     Generate an annotated image and JSON inspection report.
@@ -136,15 +138,17 @@ def generate_report(
             f"Inspection image not found: {image_path}"
         )
 
-    ANNOTATED_DIR.mkdir(parents=True, exist_ok=True)
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    annotated_dir = ANNOTATED_DIR if output_dir is None else output_dir / "annotated"
+    reports_dir = REPORTS_DIR if output_dir is None else output_dir / "reports"
+    annotated_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
     filename = f"{board_id}_{timestamp}"
 
-    annotated_path = ANNOTATED_DIR / f"{filename}.png"
-    json_path = REPORTS_DIR / f"{filename}.json"
+    annotated_path = annotated_dir / f"{filename}.png"
+    json_path = reports_dir / f"{filename}.json"
 
     # 1. Generate annotated image
     annotate_image(

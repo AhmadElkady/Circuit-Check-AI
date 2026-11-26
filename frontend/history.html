@@ -28,7 +28,7 @@
       <a class="button button-primary" href="./index.html?new=1"><span class="icon icon-plus" aria-hidden="true"></span>New inspection</a>
     </header>
 
-    <div class="history-filters" role="search" aria-label="Filter sample history">
+    <div class="history-filters" role="search" aria-label="Filter inspection history">
       <div class="history-filter search-field">
         <span class="icon icon-search" aria-hidden="true"></span>
         <label class="visually-hidden" for="filename-search">Search by filename</label>
@@ -48,7 +48,7 @@
 
     <div class="history-grid">
       <section class="panel history-list" aria-labelledby="history-heading">
-        <h2 id="history-heading">Sample history</h2>
+        <h2 id="history-heading">Saved inspections</h2>
         <table id="history-table" class="history-table" aria-labelledby="history-heading" hidden>
           <thead>
             <tr>
@@ -61,7 +61,7 @@
           <tbody id="history-rows"></tbody>
         </table>
         <div class="history-empty" id="history-empty">
-          <p role="status" id="history-status">Loading sample history…</p>
+          <p role="status" id="history-status">Loading inspection history…</p>
           <button class="button button-small" id="reset-filters" type="button" hidden>Clear filters</button>
         </div>
       </section>
@@ -72,8 +72,8 @@
           <h2 id="preview-heading">Inspection preview</h2>
         </header>
         <div class="history-image-frame">
-          <img id="history-image" alt="Annotated PCB from the selected sample" hidden>
-          <p id="preview-status" role="status">Select a sample to preview its board.</p>
+          <img id="history-image" alt="Annotated PCB from the selected inspection" hidden>
+          <p id="preview-status" role="status">Select an inspection to preview its board.</p>
         </div>
         <div class="preview-actions" id="preview-actions" hidden>
           <a class="button button-primary" id="open-inspection"><span class="icon icon-play" aria-hidden="true"></span>Open inspection</a>
