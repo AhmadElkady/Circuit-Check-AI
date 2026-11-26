@@ -4,22 +4,33 @@
 
 Circuit-Check-AI uses YOLO to locate visible defects in photos of bare printed circuit boards (PCBs). Compare the original and annotated board, zoom to individual findings, and download a PDF inspection report. Completed live runs are saved locally and can be reopened from History.
 
-[Quick start](#quick-start-on-windows) · [Interface](#interface) · [Inspection flow](#inspection-flow) · [Verdict rules](#verdict-rules)
+[Screenshots](#interface) · [PDF report](#pdf-report) · [Windows setup](#quick-start-on-windows) · [Trained model](#download-the-trained-model)
 
 ## Interface
 
-Screenshots from the running HTML, CSS, and JavaScript frontend. Inspect and History show a held-out test photo processed locally with a PCB-trained model.
+Inspect and History show the same held-out PCB photo processed by the running app.
 
 ### Inspect
 
-[![Inspect showing the original and annotated PCB side by side, a FAIL verdict, and three numbered findings](docs/media/inspect.png)](docs/media/inspect.png)
+[![Inspect with synced zoom on both PCB views, a FAIL verdict, and the second of three missing-hole findings selected](docs/media/inspect.png)](docs/media/inspect.png)
 
-Open a saved inspection or preview a JPG, JPEG, or PNG upload. Select a numbered finding or use **Previous** and **Next** to zoom to its location. **Fit board** restores the full view. Synced zoom moves both views together when the matching original is available.
+Select a numbered finding or use **Previous** and **Next** to zoom to its location. **Fit board** restores the full view. Synced zoom moves both views together when the matching original is available.
 
-| About | History |
-| --- | --- |
-| [![About showing the four inspection steps, six defect types, and an annotated PCB](docs/media/about.png)](docs/media/about.png) | [![History showing a selected live run, verdict filters, and Open inspection and Download report buttons beneath the PCB preview](docs/media/history.png)](docs/media/history.png) |
-| See the inspection workflow and supported defect types. | Search by filename, filter by verdict, reopen the exact selected run, or download its PDF. |
+### About
+
+[![About showing four inspection steps, six supported defect types, and an annotated PCB sample](docs/media/about.png)](docs/media/about.png)
+
+### History
+
+[![History showing saved records, verdict filters, and Open inspection and Download report beneath the selected board](docs/media/history.png)](docs/media/history.png)
+
+Search by filename or filter by verdict. **Open inspection** restores the selected record and its matching images, including after refreshing the browser.
+
+## PDF report
+
+Use **Download report** on either Inspect or History. The PDF includes the inspection ID, date, filename, verdict, both PCB views where available, and a numbered findings table with severity, confidence, and confirmed or review status. The example shows the PDF exported from the inspection above.
+
+[![Exported Circuit-Check-AI PDF with navy logo header, red FAIL verdict, both PCB images, and three findings](docs/media/pdf-report.png)](docs/media/pdf-report.png)
 
 ## Quick start on Windows
 
@@ -43,23 +54,30 @@ git sparse-checkout add /frontend_server.py /frontend/ /src/ /outputs/ /requirem
 
 **Open sample inspection**, **History**, and **Download report** work without model weights when the local web app is running. The repository includes five [saved reports](outputs/reports/) with matching [annotated images](outputs/annotated/). The default archived [FAIL sample](outputs/reports/board_A_20261125_220215_796447.json) has two confirmed spurious copper defects and one spur candidate for review. Inspect keeps the **Original PCB** panel visible with an unavailable message for these archives. Their PDFs label the missing original.
 
-### Live uploads
+## Download the trained model
 
-Place a PCB-trained checkpoint at `models/yolo/weights/best.pt`. Obtain it from the team or train it using the steps below. Git ignores checkpoint files, so each checkout needs its own copy for live inference.
+Cloning gives you the app, the prepared dataset, and saved examples. A PCB-trained `best.pt` enables live inspection. Obtain the checkpoint from the team or train it using the steps below. Public release of the verified checkpoint is pending confirmation of redistribution terms.
 
-On **Inspect**, choose a JPG, JPEG, or PNG up to 20 MiB and click **Run inspection**. Each successful run saves `original.png`, `annotated.png`, and `report.json` together under `outputs/inspections/<inspection-id>/`. History lists these runs alongside the bundled archives. The local run directory is Git-ignored.
+If you have `best.pt` in your Windows Downloads folder, run this from the repository root in PowerShell.
 
-**Download report** on either page generates a PDF for the selected record from its saved JSON and images. The PDF includes the verdict, counts, and a numbered findings table with severity, confidence, and confirmed or review status. The JSON remains available to the app. To repeat the live example shown above, upload the [held-out PCB photo](datasets/pcb/images/test/missing_hole__04_missing_hole_01.jpg) with the trained checkpoint in place.
+```powershell
+New-Item -ItemType Directory -Force -Path '.\models\yolo\weights' | Out-Null
+Copy-Item -LiteralPath (Join-Path $env:USERPROFILE 'Downloads\best.pt') -Destination '.\models\yolo\weights\best.pt'
+```
 
-To feature a complete local run, put its ID in `outputs/inspections/featured.json` as `{"id":"<inspection-id>"}`. The default archived sample remains available in History.
+The destination is `models/yolo/weights/best.pt`. Start the app with the [Windows launch command](#quick-start-on-windows) or return to the running app. On **Inspect**, choose a JPG, JPEG, or PNG up to 20 MiB and click **Run inspection**. To repeat the example shown above, use the [held-out PCB photo](datasets/pcb/images/test/missing_hole__04_missing_hole_01.jpg).
+
+The verified checkpoint is a fine-tuned YOLOv8n model for six PCB defect classes. It scored **62.7% mAP50**, **27.1% mAP50–95**, and **56.7% recall** on 120 held-out images. The test split contains labeled defects from one board design, so it cannot estimate the false-fail rate on clean boards.
+
+Each successful run saves `original.png`, `annotated.png`, and `report.json` under `outputs/inspections/<inspection-id>/`. History lists these records alongside the bundled archives. Both the model and live inspection records are Git-ignored.
 
 ## Inspection flow
 
 ```mermaid
 flowchart LR
   A["PCB photo"] --> B["Python + YOLO"]
-  B --> C["Filter boxes"]
-  C --> D["Verdict + images + JSON"]
+  B --> C["Filter detections"]
+  C --> D["Verdict, images, JSON"]
   classDef input fill:#0e4362,stroke:#38bdf8,color:#ffffff
   classDef detection fill:#423078,stroke:#a78bfa,color:#ffffff
   classDef result fill:#145447,stroke:#34d399,color:#ffffff
@@ -76,17 +94,18 @@ The model looks for **missing holes, mouse bites, open circuits, shorts, spurs, 
 flowchart TD
   B["Browser"] -->|"POST /api/inspect"| S["frontend_server.py"]
   S --> P["Python pipeline"]
-  P --> R["Saved run"]
-  S -->|"History and PDF"| A["outputs/"]
+  P --> O["outputs/"]
+  O -->|"Saved data"| S
+  S -->|"History or PDF"| B
   classDef browser fill:#0e4362,stroke:#38bdf8,color:#ffffff
   classDef server fill:#423078,stroke:#a78bfa,color:#ffffff
   classDef output fill:#145447,stroke:#34d399,color:#ffffff
   class B browser
   class S,P server
-  class R,A output
+  class O output
 ```
 
-The server serves the frontend and reads both archived and live records from `outputs/`. For live uploads, it reuses the existing inference, box filtering, decision, and reporting modules.
+The server reuses the inference, box filtering, decision, and reporting modules. For History and PDF export, it reads the selected record's JSON and images from disk.
 
 ## Verdict rules
 
@@ -124,10 +143,12 @@ A confirmed defect takes priority. With no confirmed defect, the decision functi
 
 ## Train and evaluate
 
-The [PCB Defects dataset](https://www.kaggle.com/datasets/akhatova/pcb-defects) is converted from Pascal VOC annotations to YOLO labels and split by board group. The prepared split contains 393 training, 180 validation, and 120 test images. In a sparse checkout, include `/datasets/pcb/` before training. Set the `path` in [data.yaml](datasets/pcb/data.yaml) to your local dataset root, then run [the training script](src/train.py) from the repository root.
+The [PCB Defects dataset](https://www.kaggle.com/datasets/akhatova/pcb-defects) is converted from Pascal VOC annotations to YOLO labels and split by board group. The prepared split contains 393 training, 180 validation, and 120 test images. The [dataset publisher limits use to academic research](https://robotics.pkusz.edu.cn/resources/registerENG/).
+
+In a sparse checkout, include `/datasets/pcb/` before training. Set the `path` in [data.yaml](datasets/pcb/data.yaml) to your local dataset root, then run [the training script](src/train.py) from the repository root.
 
 ```powershell
 .\.venv\Scripts\python.exe src/train.py
 ```
 
-The script fine-tunes YOLOv8n and copies its validation-selected checkpoint to `models/yolo/weights/best.pt`. The checkpoint used for the screenshots scored 62.7% mAP50 and 27.1% mAP50–95 on the 120 held-out images. The test split covers one board design and contains labeled defects, so it cannot estimate the false-fail rate on clean boards.
+The script fine-tunes YOLOv8n and copies its validation-selected checkpoint to `models/yolo/weights/best.pt`.
